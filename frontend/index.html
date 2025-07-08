@@ -361,8 +361,11 @@
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
                     submitBtn.disabled = true;
 
-                    // Make API call
-                    fetch('http://localhost:5000/api/analyze', {
+                    // Make API call - Auto-detect environment
+                    const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                        ? 'http://localhost:5000/api/analyze'
+                        : '/api/analyze';
+                    fetch(apiUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

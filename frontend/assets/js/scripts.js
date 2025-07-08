@@ -6,8 +6,10 @@
 let currentPortfolioData = null;
 let charts = {};
 
-// API Configuration
-const API_BASE_URL = 'http://localhost:5000/api';
+// API Configuration - Auto-detect environment
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000/api'
+    : '/api';
 
 // Portfolio presets
 const PORTFOLIO_PRESETS = {
@@ -248,34 +250,15 @@ async function handlePortfolioSubmission(event) {
     console.log('Form data collected:', formData);
     showLoading(true);
 
-    // Update loading message for better user experience
-    const loadingText = document.querySelector('#loadingSpinner .text-muted');
-    if (loadingText) {
-        loadingText.textContent = `Analyzing ${formData.stocks.length} stocks with institutional-grade accuracy...`;
-    }
-
     try {
         console.log('Sending request to:', `${API_BASE_URL}/analyze`);
-
-        // Create AbortController for timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds timeout
-
         const response = await fetch(`${API_BASE_URL}/analyze`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData),
-            signal: controller.signal
+            body: JSON.stringify(formData)
         });
-
-        clearTimeout(timeoutId);
-
-        // Update loading message
-        if (loadingText) {
-            loadingText.textContent = 'Processing analysis results...';
-        }
 
         console.log('Response status:', response.status);
 
@@ -293,17 +276,7 @@ async function handlePortfolioSubmission(event) {
 
     } catch (error) {
         console.error('Error analyzing portfolio:', error);
-
-        let errorMessage = 'Analysis failed';
-        if (error.name === 'AbortError') {
-            errorMessage = 'Analysis is taking longer than expected. Please wait and try again.';
-        } else if (error.message.includes('Failed to fetch')) {
-            errorMessage = 'Network connection error. Please check your connection and try again.';
-        } else {
-            errorMessage = `Analysis failed: ${error.message}`;
-        }
-
-        showAlert(errorMessage, 'danger');
+        showAlert(`Analysis failed: ${error.message}`, 'danger');
     } finally {
         showLoading(false);
     }

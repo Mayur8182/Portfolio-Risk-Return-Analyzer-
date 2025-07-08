@@ -1,7 +1,7 @@
 services:
   - type: web
     name: portfolio-analytics-platform
-    env: python
+    runtime: python
     region: oregon
     plan: starter
     buildCommand: "./render-build.sh"
@@ -14,7 +14,7 @@ services:
       - key: FLASK_ENV
         value: production
       - key: FLASK_DEBUG
-        value: false
+        value: "false"
       - key: PORT
         value: 5000
       - key: FINNHUB_API_KEY

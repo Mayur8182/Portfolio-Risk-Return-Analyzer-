@@ -57,12 +57,25 @@ class SimpleDataFetcher:
                 try:
                     logger.info(f"Fetching data for {symbol}")
                     
-                    # Get historical data
+                    # Get historical data with multiple fallback options
                     ticker = yf.Ticker(symbol)
-                    hist = ticker.history(period=yf_period)
-                    
-                    if hist.empty:
-                        logger.warning(f"No data returned for {symbol}")
+
+                    # Try different periods if the requested one fails
+                    periods_to_try = [yf_period, '1y', '6mo', '3mo', '1mo']
+                    hist = None
+
+                    for try_period in periods_to_try:
+                        try:
+                            hist = ticker.history(period=try_period)
+                            if not hist.empty:
+                                logger.info(f"Successfully fetched data for {symbol} with period {try_period}")
+                                break
+                        except Exception as e:
+                            logger.warning(f"Failed to fetch {symbol} with period {try_period}: {e}")
+                            continue
+
+                    if hist is None or hist.empty:
+                        logger.warning(f"No data returned for {symbol} after trying all periods")
                         continue
                     
                     # Use Close price (most reliable column)

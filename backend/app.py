@@ -20,6 +20,10 @@ from utils import format_response, validate_portfolio_input
 from pdf_generator import ProfessionalPDFGenerator
 from enhanced_accuracy_config import EnhancedAccuracyConfig, InstitutionalDataValidator
 
+# Configure logging first
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Enhanced modules
 try:
     from enhanced_data_fetcher import EnhancedDataFetcher
@@ -36,10 +40,6 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from visualizations.chart_data import ChartDataGenerator
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__, 
@@ -242,39 +242,7 @@ def analyze_portfolio():
 
         if market_data is None:
             return jsonify({'error': 'Failed to fetch market data'}), 500
-
-        # Check if market data columns match requested stocks
-        available_stocks = list(market_data.columns)
-        logger.info(f"Available stocks in market data: {available_stocks}")
-        logger.info(f"Requested stocks: {stocks}")
-
-        # Adjust weights to match available data
-        if len(available_stocks) != len(stocks):
-            logger.warning(f"Stock count mismatch: requested {len(stocks)}, got {len(available_stocks)}")
-
-            # Create new weights array matching available stocks
-            adjusted_weights = []
-            adjusted_stocks = []
-
-            for i, stock in enumerate(stocks):
-                if stock in available_stocks:
-                    adjusted_weights.append(weights[i])
-                    adjusted_stocks.append(stock)
-                else:
-                    logger.warning(f"Stock {stock} not available in market data")
-
-            # Normalize weights to sum to 1
-            if adjusted_weights:
-                total_weight = sum(adjusted_weights)
-                adjusted_weights = [w / total_weight for w in adjusted_weights]
-                logger.info(f"Adjusted weights: {adjusted_weights} for stocks: {adjusted_stocks}")
-
-                # Update variables for analysis
-                weights = adjusted_weights
-                stocks = adjusted_stocks
-            else:
-                return jsonify({'error': 'No valid stock data available'}), 500
-
+        
         # Perform risk analysis with enhanced analytics if available
         if ENHANCED_MODE and advanced_analytics:
             try:

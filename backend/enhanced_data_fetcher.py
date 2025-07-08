@@ -10,7 +10,11 @@ import numpy as np
 from datetime import datetime, timedelta
 import logging
 import asyncio
-import aiohttp
+try:
+    import aiohttp
+    AIOHTTP_AVAILABLE = True
+except ImportError:
+    AIOHTTP_AVAILABLE = False
 from typing import Dict, List, Optional, Tuple
 import hashlib
 import time
@@ -359,46 +363,27 @@ class EnhancedDataFetcher:
         """
         try:
             all_data = {}
-
-            # Use parallel processing for faster data fetching
-            from concurrent.futures import ThreadPoolExecutor, as_completed
-            import time
-
-            def fetch_symbol_data(symbol):
-                """Fetch data for a single symbol"""
-                try:
-                    logger.info(f"Fetching enhanced data for {symbol}")
-                    start_time = time.time()
-
-                    # Try Twelve Data first for historical data
-                    df = self.get_historical_data_twelvedata(symbol, interval="1day")
-
-                    if df is not None and not df.empty:
-                        # Get real-time quote for latest price (optional, for speed)
-                        # real_time = self.get_real_time_quote_finnhub(symbol)
-
-                        # Get comprehensive company data (optional, for speed)
-                        # company_data = self.get_comprehensive_company_data_finnhub(symbol)
-
-                        fetch_time = time.time() - start_time
-                        logger.info(f"✅ Successfully fetched {len(df)} data points for {symbol} in {fetch_time:.2f}s")
-                        return symbol, df['close']
-                    else:
-                        logger.warning(f"❌ No data available for {symbol}")
-                        return symbol, None
-
-                except Exception as e:
-                    logger.error(f"❌ Error fetching {symbol}: {e}")
-                    return symbol, None
-
-            # Fetch data in parallel (max 4 concurrent requests to avoid rate limits)
-            with ThreadPoolExecutor(max_workers=4) as executor:
-                future_to_symbol = {executor.submit(fetch_symbol_data, symbol): symbol for symbol in symbols}
-
-                for future in as_completed(future_to_symbol):
-                    symbol, data = future.result()
-                    if data is not None:
-                        all_data[symbol] = data
+            
+            for symbol in symbols:
+                logger.info(f"Fetching enhanced data for {symbol}")
+                
+                # Try Twelve Data first for historical data
+                df = self.get_historical_data_twelvedata(symbol, interval="1day")
+                
+                if df is not None and not df.empty:
+                    # Get real-time quote for latest price
+                    real_time = self.get_real_time_quote_finnhub(symbol)
+                    
+                    # Get comprehensive company data
+                    company_data = self.get_comprehensive_company_data_finnhub(symbol)
+                    
+                    # Use adjusted close or close price
+                    all_data[symbol] = df['close']
+                    
+                    logger.info(f"Successfully fetched {len(df)} data points for {symbol}")
+                else:
+                    logger.warning(f"No data available for {symbol}")
+                    continue
             
             if not all_data:
                 logger.error("No data fetched for any symbols")
@@ -414,15 +399,7 @@ class EnhancedDataFetcher:
                 logger.error("No valid data after cleaning")
                 return None
             
-            logger.info(f"Enhanced portfolio data ready: {len(portfolio_df)} data points for {len(portfolio_df.columns)} symbols")
-            logger.info(f"Successfully fetched symbols: {list(portfolio_df.columns)}")
-            logger.info(f"Requested symbols: {symbols}")
-
-            # Check if any symbols are missing
-            missing_symbols = set(symbols) - set(portfolio_df.columns)
-            if missing_symbols:
-                logger.warning(f"Missing data for symbols: {missing_symbols}")
-
+            logger.info(f"Enhanced portfolio data ready: {len(portfolio_df)} data points for {len(symbols)} symbols")
             return portfolio_df
             
         except Exception as e:

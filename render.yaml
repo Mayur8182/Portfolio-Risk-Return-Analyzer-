@@ -1,0 +1,70 @@
+services:
+  - type: web
+    name: portfolio-analytics-platform
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: "./render-build.sh"
+    startCommand: "./render-start.sh"
+    healthCheckPath: /health
+    
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.5
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: false
+      - key: PORT
+        value: 5000
+      - key: FINNHUB_API_KEY
+        value: d1hodf1r01qsvr2be4r0d1hodf1r01qsvr2be4rg
+      - key: TWELVEDATA_API_KEY
+        value: b57491954ba64f1d9c851fb4c157bf51
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MONGODB_URI
+        value: mongodb+srv://mkbharvad8080:Mkb%408080@cluster0.a82h2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - key: DATABASE_URL
+        value: mongodb+srv://mkbharvad8080:Mkb%408080@cluster0.a82h2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ENABLE_ENHANCED_ANALYTICS
+        value: "true"
+      - key: ENABLE_REAL_TIME_DATA
+        value: "true"
+      - key: ENABLE_PDF_EXPORT
+        value: "true"
+      - key: MIN_DATA_QUALITY_SCORE
+        value: "0.85"
+      - key: INSTITUTIONAL_GRADE_THRESHOLD
+        value: "0.95"
+      - key: CACHE_TIMEOUT
+        value: "3600"
+      - key: API_RATE_LIMIT
+        value: "100"
+      - key: WORKERS
+        value: "4"
+      - key: WORKER_CONNECTIONS
+        value: "1000"
+      - key: TIMEOUT
+        value: "120"
+      - key: MAIL_USERNAME
+        value: mkbharvad534@gmail.com
+      - key: MAIL_PASSWORD
+        value: "dwtp fmiq miyl ccvq"
+      - key: SMTP_SERVER
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: ENABLE_EMAIL_REPORTS
+        value: "true"
+
+    # Auto-deploy settings
+    autoDeploy: true
+
+    # Resource limits
+    disk:
+      name: portfolio-analytics-disk
+      mountPath: /opt/render/project/src/reports
+      sizeGB: 1

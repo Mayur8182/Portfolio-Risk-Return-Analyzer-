@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Analysis Results</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .metric-card {
+            transition: transform 0.2s ease;
+            border-radius: 12px;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: #6b7280; }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-chart-line me-2"></i>
+                Portfolio Risk Analyzer
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-home me-1"></i>Back to Home
+                </a>
+                <button class="btn btn-outline-light btn-sm ms-2" onclick="exportResults()">
+                    <i class="fas fa-download me-1"></i>Export
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 sidebar text-white p-4">
+                <div class="mb-4">
+                    <h4 class="fw-bold">Portfolio Summary</h4>
+                    <div id="portfolioSummary">
+                        <div class="text-center">
+                            <div class="spinner-border text-light" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading portfolio data...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5 class="fw-semibold">Analysis Status</h5>
+                    <div id="analysisStatus">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Analysis Complete</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9 p-4">
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-5">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h4>Loading Portfolio Analysis...</h4>
+                    <p class="text-muted">Please wait while we process your results</p>
+                </div>
+                
+                <!-- Results Content -->
+                <div id="resultsContent" style="display: none;">
+                    <!-- Key Metrics Row -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card metric-card border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="text-primary mb-2">
+                                        <i class="fas fa-chart-line fa-2x"></i>
+                                    </div>
+                                    <div class="metric-value" id="totalReturn">--</div>
+                                    <div class="text-muted small">Total Return</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="card metric-card border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="text-warning mb-2">
+                                        <i class="fas fa-star fa-2x"></i>
+                                    </div>
+                                    <div class="metric-value" id="sharpeRatio">--</div>
+                                    <div class="text-muted small">Sharpe Ratio</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="card metric-card border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="text-danger mb-2">
+                                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                    </div>
+                                    <div class="metric-value" id="volatility">--</div>
+                                    <div class="text-muted small">Volatility</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="card metric-card border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="text-info mb-2">
+                                        <i class="fas fa-arrow-down fa-2x"></i>
+                                    </div>
+                                    <div class="metric-value" id="maxDrawdown">--</div>
+                                    <div class="text-muted small">Max Drawdown</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="row mb-4">
+                        <div class="col-lg-8">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Portfolio Allocation</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="allocationChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Risk Metrics</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="riskMetricsList">
+                                        <!-- Risk metrics will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Results Table -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Detailed Analysis Results</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="detailedResults">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Metric</th>
+                                                    <th>Value</th>
+                                                    <th>Interpretation</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Results will be populated here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Error State -->
+                <div id="errorState" style="display: none;" class="text-center py-5">
+                    <div class="text-danger mb-3">
+                        <i class="fas fa-exclamation-circle fa-4x"></i>
+                    </div>
+                    <h4>No Analysis Data Found</h4>
+                    <p class="text-muted">Please go back and analyze a portfolio first.</p>
+                    <a href="index.html" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Portfolio Input
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let portfolioData = null;
+        let allocationChart = null;
+        
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPortfolioData();
+        });
+        
+        function loadPortfolioData() {
+            try {
+                const storedData = localStorage.getItem('portfolioAnalysis');
+                if (!storedData) {
+                    showErrorState();
+                    return;
+                }
+                
+                portfolioData = JSON.parse(storedData);
+                console.log('Loaded portfolio data:', portfolioData);
+                
+                if (portfolioData && portfolioData.success && portfolioData.data) {
+                    displayResults(portfolioData.data);
+                } else {
+                    showErrorState();
+                }
+                
+            } catch (error) {
+                console.error('Error loading portfolio data:', error);
+                showErrorState();
+            }
+        }
+        
+        function displayResults(data) {
+            // Hide loading, show results
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+            
+            // Display portfolio summary
+            displayPortfolioSummary(data.portfolio);
+            
+            // Display key metrics
+            displayKeyMetrics(data.risk_metrics, data.performance_metrics);
+            
+            // Display charts
+            displayCharts(data);
+            
+            // Display detailed results
+            displayDetailedResults(data.risk_metrics);
+        }
+        
+        function displayPortfolioSummary(portfolio) {
+            const summaryHtml = `
+                <div class="mb-3">
+                    <h6 class="text-light mb-2">Assets (${portfolio.stocks.length})</h6>
+                    ${portfolio.stocks.map((stock, index) => `
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-light">${stock}</span>
+                            <span class="badge bg-light text-dark">${(portfolio.weights[index] * 100).toFixed(1)}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center">
+                    <small class="text-light opacity-75">Total: ${(portfolio.total_value * 100).toFixed(1)}%</small>
+                </div>
+            `;
+            
+            document.getElementById('portfolioSummary').innerHTML = summaryHtml;
+        }
+        
+        function displayKeyMetrics(riskMetrics, performanceMetrics) {
+            // Total Return
+            const totalReturn = performanceMetrics?.portfolio_total_return || riskMetrics?.total_return || 0;
+            document.getElementById('totalReturn').textContent = formatPercentage(totalReturn);
+            document.getElementById('totalReturn').className = `metric-value ${getChangeClass(totalReturn)}`;
+            
+            // Sharpe Ratio
+            const sharpeRatio = riskMetrics?.sharpe_ratio || 0;
+            document.getElementById('sharpeRatio').textContent = formatNumber(sharpeRatio, 3);
+            document.getElementById('sharpeRatio').className = `metric-value ${getChangeClass(sharpeRatio)}`;
+            
+            // Volatility
+            const volatility = riskMetrics?.annualized_volatility || 0;
+            document.getElementById('volatility').textContent = formatPercentage(volatility);
+            document.getElementById('volatility').className = `metric-value ${getChangeClass(-volatility)}`;
+            
+            // Max Drawdown
+            const maxDrawdown = riskMetrics?.max_drawdown || 0;
+            document.getElementById('maxDrawdown').textContent = formatPercentage(maxDrawdown);
+            document.getElementById('maxDrawdown').className = `metric-value ${getChangeClass(maxDrawdown)}`;
+        }
+        
+        function displayCharts(data) {
+            // Portfolio Allocation Chart
+            if (data.portfolio) {
+                const ctx = document.getElementById('allocationChart').getContext('2d');
+                
+                if (allocationChart) {
+                    allocationChart.destroy();
+                }
+                
+                allocationChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: data.portfolio.stocks,
+                        datasets: [{
+                            data: data.portfolio.weights.map(w => w * 100),
+                            backgroundColor: [
+                                '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+                                '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function displayDetailedResults(riskMetrics) {
+            const metrics = [
+                { name: 'Annualized Return', value: formatPercentage(riskMetrics.annualized_return || 0), interpretation: getReturnInterpretation(riskMetrics.annualized_return || 0) },
+                { name: 'Volatility', value: formatPercentage(riskMetrics.annualized_volatility || 0), interpretation: getVolatilityInterpretation(riskMetrics.annualized_volatility || 0) },
+                { name: 'Sharpe Ratio', value: formatNumber(riskMetrics.sharpe_ratio || 0, 3), interpretation: getSharpeInterpretation(riskMetrics.sharpe_ratio || 0) },
+                { name: 'Sortino Ratio', value: formatNumber(riskMetrics.sortino_ratio || 0, 3), interpretation: getSortinoInterpretation(riskMetrics.sortino_ratio || 0) },
+                { name: 'Value at Risk (95%)', value: formatPercentage(riskMetrics.var_95 || 0), interpretation: getVaRInterpretation(riskMetrics.var_95 || 0) },
+                { name: 'Maximum Drawdown', value: formatPercentage(riskMetrics.max_drawdown || 0), interpretation: getDrawdownInterpretation(riskMetrics.max_drawdown || 0) }
+            ];
+            
+            const tbody = document.querySelector('#detailedResults tbody');
+            tbody.innerHTML = metrics.map(metric => `
+                <tr>
+                    <td class="fw-semibold">${metric.name}</td>
+                    <td>${metric.value}</td>
+                    <td>${metric.interpretation}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function showErrorState() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+        
+        function exportResults() {
+            if (!portfolioData) {
+                alert('No data to export');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(portfolioData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `portfolio_analysis_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+        
+        // Utility functions
+        function formatPercentage(value, decimals = 2) {
+            if (typeof value !== 'number') return '--';
+            return `${(value * 100).toFixed(decimals)}%`;
+        }
+        
+        function formatNumber(value, decimals = 2) {
+            if (typeof value !== 'number') return '--';
+            return value.toFixed(decimals);
+        }
+        
+        function getChangeClass(value) {
+            if (value > 0) return 'positive';
+            if (value < 0) return 'negative';
+            return 'neutral';
+        }
+        
+        function getReturnInterpretation(value) {
+            if (value > 0.15) return 'Excellent';
+            if (value > 0.10) return 'Good';
+            if (value > 0.05) return 'Moderate';
+            return 'Poor';
+        }
+        
+        function getVolatilityInterpretation(value) {
+            if (value < 0.10) return 'Low Risk';
+            if (value < 0.20) return 'Moderate Risk';
+            if (value < 0.30) return 'High Risk';
+            return 'Very High Risk';
+        }
+        
+        function getSharpeInterpretation(value) {
+            if (value > 2) return 'Excellent';
+            if (value > 1) return 'Good';
+            if (value > 0) return 'Acceptable';
+            return 'Poor';
+        }
+        
+        function getSortinoInterpretation(value) {
+            if (value > 2) return 'Excellent';
+            if (value > 1) return 'Good';
+            if (value > 0) return 'Acceptable';
+            return 'Poor';
+        }
+        
+        function getVaRInterpretation(value) {
+            if (value > -0.02) return 'Low Risk';
+            if (value > -0.05) return 'Moderate Risk';
+            if (value > -0.1) return 'High Risk';
+            return 'Very High Risk';
+        }
+        
+        function getDrawdownInterpretation(value) {
+            if (value > -0.05) return 'Excellent';
+            if (value > -0.1) return 'Good';
+            if (value > -0.2) return 'Acceptable';
+            return 'Poor';
+        }
+    </script>
+</body>
+</html>

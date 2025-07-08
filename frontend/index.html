@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Risk Analysis Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .portfolio-input {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+        }
+        
+        .btn-analyze {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-chart-line me-2"></i>
+                Portfolio Risk Analyzer
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#portfolio-input">Analyze Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white py-5" style="margin-top: 56px; min-height: 60vh;">
+        <div class="container">
+            <div class="row align-items-center min-vh-50">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">
+                        Professional Portfolio Risk Analysis
+                    </h1>
+                    <p class="lead mb-4">
+                        Analyze your investment portfolio with institutional-grade risk metrics, 
+                        optimization algorithms, and sentiment analysis. Get insights similar to 
+                        BlackRock's Aladdin platform.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="#portfolio-input" class="btn btn-light btn-lg px-4">
+                            <i class="fas fa-rocket me-2"></i>Start Analysis
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-4">
+                            Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="text-center">
+                        <i class="fas fa-chart-area fa-10x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Advanced Analytics Features</h2>
+                <p class="lead text-muted">Comprehensive portfolio analysis tools for informed investment decisions</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card feature-card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="text-primary mb-3">
+                                <i class="fas fa-shield-alt fa-3x"></i>
+                            </div>
+                            <h5 class="card-title">Risk Analysis</h5>
+                            <p class="card-text text-muted">
+                                VaR, Sharpe Ratio, Maximum Drawdown, Beta, and comprehensive risk metrics
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card feature-card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="text-success mb-3">
+                                <i class="fas fa-cogs fa-3x"></i>
+                            </div>
+                            <h5 class="card-title">Portfolio Optimization</h5>
+                            <p class="card-text text-muted">
+                                Modern Portfolio Theory, Efficient Frontier, Maximum Sharpe optimization
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card feature-card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="text-info mb-3">
+                                <i class="fas fa-brain fa-3x"></i>
+                            </div>
+                            <h5 class="card-title">Sentiment Analysis</h5>
+                            <p class="card-text text-muted">
+                                News sentiment, social media analysis, and market mood indicators
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card feature-card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="text-warning mb-3">
+                                <i class="fas fa-chart-line fa-3x"></i>
+                            </div>
+                            <h5 class="card-title">Interactive Charts</h5>
+                            <p class="card-text text-muted">
+                                Real-time visualizations, correlation heatmaps, and performance tracking
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Input Section -->
+    <section id="portfolio-input" class="py-5 bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="portfolio-input p-5 shadow-lg">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold">Analyze Your Portfolio</h3>
+                            <p class="text-muted">Enter your stock symbols and weights to get started</p>
+                        </div>
+                        
+                        <form id="portfolioForm">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Stock Symbols</label>
+                                    <div id="stockInputs">
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control stock-symbol" placeholder="e.g., AAPL" required>
+                                            <input type="number" class="form-control stock-weight" placeholder="Weight %" min="0" max="100" step="0.1" required>
+                                            <button type="button" class="btn btn-outline-danger remove-stock" style="display: none;">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="addStock" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-plus me-1"></i>Add Stock
+                                    </button>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Quick Presets</label>
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-outline-secondary preset-btn" data-preset="tech">
+                                            Tech Portfolio (AAPL, GOOGL, MSFT)
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary preset-btn" data-preset="diversified">
+                                            Diversified (SPY, QQQ, VTI, IWM)
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary preset-btn" data-preset="growth">
+                                            Growth (TSLA, NVDA, AMD, NFLX)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Analysis Period</label>
+                                    <select class="form-select" id="analysisPeriod">
+                                        <option value="1y" selected>1 Year</option>
+                                        <option value="2y">2 Years</option>
+                                        <option value="3y">3 Years</option>
+                                        <option value="5y">5 Years</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Risk-Free Rate (%)</label>
+                                    <input type="number" class="form-control" id="riskFreeRate" value="2.0" min="0" max="10" step="0.1">
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-analyze btn-lg px-5 text-white">
+                                    <i class="fas fa-chart-bar me-2"></i>
+                                    Analyze Portfolio
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Loading Spinner -->
+                        <div id="loadingSpinner" class="text-center mt-4" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Analyzing your portfolio...</p>
+                        </div>
+                        
+                        <!-- Error Alert -->
+                        <div id="errorAlert" class="alert alert-danger mt-4" style="display: none;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="errorMessage"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h3 class="fw-bold mb-4">About This Platform</h3>
+                    <p class="mb-3">
+                        This Portfolio Risk Analysis Dashboard provides institutional-grade analytics 
+                        for investment portfolios, similar to tools used by professional asset managers.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Real-time market data integration</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Advanced risk metrics calculation</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Portfolio optimization algorithms</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Sentiment analysis and news monitoring</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Interactive data visualizations</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6">
+                    <div class="text-center">
+                        <i class="fas fa-university fa-8x text-muted opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="fw-bold">Portfolio Risk Analyzer</h6>
+                    <p class="text-muted small">Professional portfolio analysis and risk management tools.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted small mb-0">
+                        Built with Python, Flask, Bootstrap & Tailwind CSS
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="assets/js/scripts.js"></script>
+
+    <!-- Additional inline script for immediate functionality -->
+    <script>
+        // Backup event listeners in case the main script fails
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Backup script loaded');
+
+            // Ensure form submission works
+            const form = document.getElementById('portfolioForm');
+            if (form && !form.hasAttribute('data-listener-added')) {
+                form.setAttribute('data-listener-added', 'true');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('Form submitted via backup handler');
+
+                    // Simple form handling
+                    const symbols = Array.from(document.querySelectorAll('.stock-symbol'))
+                        .map(input => input.value.trim().toUpperCase())
+                        .filter(symbol => symbol);
+
+                    const weights = Array.from(document.querySelectorAll('.stock-weight'))
+                        .map(input => parseFloat(input.value) || 0)
+                        .filter(weight => weight > 0);
+
+                    if (symbols.length === 0 || weights.length === 0) {
+                        alert('Please enter at least one stock symbol and weight');
+                        return;
+                    }
+
+                    if (symbols.length !== weights.length) {
+                        alert('Number of symbols and weights must match');
+                        return;
+                    }
+
+                    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+                    if (Math.abs(totalWeight - 100) > 1) {
+                        alert('Weights must sum to 100%');
+                        return;
+                    }
+
+                    // Show loading
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+                    submitBtn.disabled = true;
+
+                    // Make API call
+                    fetch('http://localhost:5000/api/analyze', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            stocks: symbols,
+                            weights: weights.map(w => w / 100),
+                            period: document.getElementById('analysisPeriod')?.value || '1y'
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Analysis failed');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        localStorage.setItem('portfolioAnalysis', JSON.stringify(data));
+                        window.location.href = 'visual-dashboard.html';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Analysis failed: ' + error.message);
+                    })
+                    .finally(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    });
+                });
+            }
+
+            // Ensure add stock button works
+            const addBtn = document.getElementById('addStock');
+            if (addBtn && !addBtn.hasAttribute('data-listener-added')) {
+                addBtn.setAttribute('data-listener-added', 'true');
+                addBtn.addEventListener('click', function() {
+                    console.log('Add stock clicked via backup handler');
+                    const container = document.getElementById('stockInputs');
+                    const newGroup = document.createElement('div');
+                    newGroup.className = 'input-group mb-2';
+                    newGroup.innerHTML = `
+                        <input type="text" class="form-control stock-symbol" placeholder="e.g., AAPL" required>
+                        <input type="number" class="form-control stock-weight" placeholder="Weight %" min="0" max="100" step="0.1" required>
+                        <button type="button" class="btn btn-outline-danger remove-stock">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    container.appendChild(newGroup);
+                });
+            }
+
+            // Ensure preset buttons work
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                if (!btn.hasAttribute('data-listener-added')) {
+                    btn.setAttribute('data-listener-added', 'true');
+                    btn.addEventListener('click', function() {
+                        console.log('Preset clicked via backup handler:', this.dataset.preset);
+                        const presets = {
+                            tech: { stocks: ['AAPL', 'GOOGL', 'MSFT'], weights: [40, 35, 25] },
+                            diversified: { stocks: ['SPY', 'QQQ', 'VTI', 'IWM'], weights: [40, 25, 20, 15] },
+                            growth: { stocks: ['TSLA', 'NVDA', 'AMD', 'NFLX'], weights: [30, 25, 25, 20] }
+                        };
+
+                        const preset = presets[this.dataset.preset];
+                        if (preset) {
+                            const container = document.getElementById('stockInputs');
+                            container.innerHTML = '';
+
+                            preset.stocks.forEach((stock, index) => {
+                                const newGroup = document.createElement('div');
+                                newGroup.className = 'input-group mb-2';
+                                newGroup.innerHTML = `
+                                    <input type="text" class="form-control stock-symbol" value="${stock}" required>
+                                    <input type="number" class="form-control stock-weight" value="${preset.weights[index]}" min="0" max="100" step="0.1" required>
+                                    <button type="button" class="btn btn-outline-danger remove-stock" style="display: ${preset.stocks.length > 1 ? 'block' : 'none'}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                `;
+                                container.appendChild(newGroup);
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Handle remove buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-stock') ||
+                    e.target.parentElement.classList.contains('remove-stock')) {
+                    e.target.closest('.input-group').remove();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

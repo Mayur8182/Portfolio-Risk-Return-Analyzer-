@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Dashboard - Risk Analysis</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    
+    <style>
+        .metric-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .metric-change {
+            font-size: 0.875rem;
+        }
+        
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: #6b7280; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-chart-line me-2"></i>
+                Portfolio Risk Analyzer
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+                <button class="btn btn-outline-light btn-sm ms-2" onclick="switchToVisualDashboard()">
+                    <i class="fas fa-chart-area me-1"></i>Visual Dashboard
+                </button>
+                <button class="btn btn-outline-light btn-sm ms-2" onclick="exportReport()">
+                    <i class="fas fa-file-pdf me-1"></i>Export PDF
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 sidebar text-white p-4">
+                <div class="mb-4">
+                    <h4 class="fw-bold">Portfolio Overview</h4>
+                    <div id="portfolioSummary">
+                        <!-- Portfolio summary will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5 class="fw-semibold">Quick Actions</h5>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-light btn-sm" onclick="optimizePortfolio()">
+                            <i class="fas fa-cogs me-1"></i>Optimize Portfolio
+                        </button>
+                        <button class="btn btn-light btn-sm" onclick="refreshData()">
+                            <i class="fas fa-sync me-1"></i>Refresh Data
+                        </button>
+                        <button class="btn btn-light btn-sm" onclick="showRiskAnalysis()">
+                            <i class="fas fa-shield-alt me-1"></i>Risk Analysis
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5 class="fw-semibold">Market Sentiment</h5>
+                    <div id="sentimentOverview">
+                        <!-- Sentiment overview will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9 p-4">
+                <!-- Key Metrics Row -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card metric-card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-primary mb-2">
+                                    <i class="fas fa-chart-line fa-2x"></i>
+                                </div>
+                                <div class="metric-value" id="totalReturn">--</div>
+                                <div class="text-muted small">Total Return</div>
+                                <div class="metric-change" id="totalReturnChange">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="card metric-card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-warning mb-2">
+                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                </div>
+                                <div class="metric-value" id="sharpeRatio">--</div>
+                                <div class="text-muted small">Sharpe Ratio</div>
+                                <div class="metric-change" id="sharpeRatioChange">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="card metric-card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-danger mb-2">
+                                    <i class="fas fa-shield-alt fa-2x"></i>
+                                </div>
+                                <div class="metric-value" id="volatility">--</div>
+                                <div class="text-muted small">Volatility</div>
+                                <div class="metric-change" id="volatilityChange">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="card metric-card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-info mb-2">
+                                    <i class="fas fa-arrow-down fa-2x"></i>
+                                </div>
+                                <div class="metric-value" id="maxDrawdown">--</div>
+                                <div class="text-muted small">Max Drawdown</div>
+                                <div class="metric-change" id="maxDrawdownChange">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 1 -->
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Portfolio Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="performanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Asset Allocation</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="allocationChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 2 -->
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Risk Profile</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="riskRadarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Correlation Matrix</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="correlationHeatmap" class="chart-container">
+                                    <!-- Heatmap will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 3 -->
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Individual Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="individualPerformanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Returns Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="returnsDistributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Metrics Table -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Detailed Risk Metrics</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="riskMetricsTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Metric</th>
+                                                <th>Value</th>
+                                                <th>Interpretation</th>
+                                                <th>Benchmark</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Risk metrics will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optimization Modal -->
+    <div class="modal fade" id="optimizationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Portfolio Optimization Results</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="optimizationResults">
+                        <!-- Optimization results will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="applyOptimization()">Apply Optimization</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
+         style="background: rgba(0,0,0,0.5); z-index: 9999; display: none !important;">
+        <div class="text-center text-white">
+            <div class="spinner-border mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h5>Analyzing Portfolio...</h5>
+            <p>Please wait while we process your data</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="assets/js/scripts.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

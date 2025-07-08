@@ -5,6 +5,7 @@ Flask-CORS==4.0.0
 # Essential Data Analysis (minimal versions)
 numpy==1.24.4
 pandas==2.0.3
+scipy==1.11.4
 
 # Financial Data APIs
 yfinance==0.2.18
